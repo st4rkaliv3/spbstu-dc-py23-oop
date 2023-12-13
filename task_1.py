@@ -1,25 +1,38 @@
-from typing import Union
+from typing import Union, Optional
+
 
 class Tone:
-    def __init__(self, key_no: Union[int, None], value: Union[int, float], velocity: Union[int, float]):
+    def __init__(self, key_no: Optional[int], value: Union[int, float], velocity: Union[int, float]):
         """
         Создание и подготовка к работе объекта Нота
 
         :param key_no: номер клавиши от 0 до 127 (40 - это нота _ _-й октавы) или пустое значение (для паузы)
-        :param value: длительность ноты (относительно целой ноты; например, 1 - целая нота, 0.75 - половинка с точкой, 0.5 - половинка)
+        :param value: длительность ноты (относительно целой ноты)
+        например, 1 - целая нота, 0.75 - половинка с точкой, 0.5 - половинка)
         :param velocity: сила нажатия от 0.0 до 1.0
 
         Примеры:
         >>> tone = Tone(40, 1 / 2, 0.77)
         """
-        self.key_no = None
-        self.set_key_no(key_no)
-        self.value = None
-        self.set_value(value)
-        self.velocity = None
-        self.set_velocity(velocity)
+        if not isinstance(key_no, (int, type(None))):
+            raise TypeError("Номер клавиши должен быть целым числом или пустым (для паузы)")
+        if not (key_no is None or 0 <= key_no <= 127):
+            raise ValueError("Номер клавиши должен быть в диапазоне [0..127]")
+        self.key_no = key_no
 
-    def set_key_no(self, key_no: int):
+        if not isinstance(value, (int, float)):
+            raise TypeError("Длительность должна быть числом")
+        if value <= 0.0:
+            raise ValueError("Длительность должна быть положительной")
+        self.value = value
+
+        if not isinstance(velocity, (int, float)):
+            raise TypeError("Сила нажатия должна быть числом")
+        if not (0.0 <= velocity <= 1.0):
+            raise ValueError("Сила нажатия должна быть в диапазоне [0..1]")
+        self.velocity = velocity
+
+    def set_key_no(self, key_no: Optional[int]):
         """
         Установка номера клавиши или паузы
 
@@ -30,9 +43,9 @@ class Tone:
         >>> tone.set_key_no(41)
         >>> tone.set_key_no(None) # превратили ноту в паузу
         """
-        if not isinstance(key_no, (int, None)):
+        if not isinstance(key_no, (int, type(None))):
             raise TypeError("Номер клавиши должен быть целым числом или пустым (для паузы)")
-        if not (isinstance(key_no, None) or (key_no >= 0 and key_no <= 127)):
+        if not (key_no is None or 0 <= key_no <= 127):
             raise ValueError("Номер клавиши должен быть в диапазоне [0..127]")
         self.key_no = key_no
 
@@ -40,7 +53,8 @@ class Tone:
         """
         Установка длительности
 
-        :param value: длительность ноты (относительно целой ноты; например, 1 - целая нота, 0.75 - половинка с точкой, 0.5 - половинка)
+        :param value: длительность ноты (относительно целой ноты)
+        например, 1 - целая нота, 0.75 - половинка с точкой, 0.5 - половинка)
 
         Примеры:
         >>> tone = Tone(40, 1 / 2, 0.77)
@@ -64,12 +78,12 @@ class Tone:
         """
         if not isinstance(velocity, (int, float)):
             raise TypeError("Сила нажатия должна быть числом")
-        if not (velocity >= 0.0 and velocity <= 1.0):
+        if not (0.0 <= velocity <= 1.0):
             raise ValueError("Сила нажатия должна быть в диапазоне [0..1]")
         self.velocity = velocity
 
 
-class Pattern: # пианоролл
+class Pattern:
     def __init__(self, start_bar: int, instrument: str):
         """
         Создание и подготовка к работе объекта Паттерн
@@ -80,10 +94,18 @@ class Pattern: # пианоролл
         Примеры
         >>> pattern = Pattern(1, 'Скрипка')
         """
-        self.start_bar = None
-        self.set_start_bar(start_bar)
-        self.instrument = None
-        self.set_instrument(instrument)
+        if not isinstance(start_bar, int):
+            raise TypeError(" должен быть целым числом")
+        if start_bar < 0:
+            raise ValueError(" должен быть неотрицательным")
+        self.start_bar = start_bar
+
+        if not isinstance(instrument, str):
+            raise TypeError("Инструмент должен быть строкой")
+        if instrument == "":
+            raise ValueError("Название инструмента не может быть пустым")
+        self.instrument = instrument
+
         self.tones = []
 
     def set_start_bar(self, start_bar: int):
@@ -157,7 +179,8 @@ class Pattern: # пианоролл
         """
         Выравнивание паттерна по длительности
 
-        :param threshold_note_value: длительность, по которой будет выровнен паттерн (относительно целой ноты; например, целая нота - 1.0, половинка с точкой - 0.75, половинка - 0.5)
+        :param threshold_note_value: длительность, по которой будет выровнен паттерн (относительно целой ноты)
+        например, целая нота - 1.0, половинка с точкой - 0.75, половинка - 0.5)
 
         Примеры
         >>> musical_work = MusicalWork("Сонатина №6", "В.А.Моцарт", 140)  # инициализация экземпляра класса
@@ -219,7 +242,7 @@ class Pattern: # пианоролл
 
 
 class MusicalWork:
-    def __init__(self, name: str, author: Union[str, None], tempo: int):
+    def __init__(self, name: str, author: Optional[str], tempo: int):
         """
         Создание и подготовка к работе объекта Музыкальное произведение
 
@@ -230,12 +253,22 @@ class MusicalWork:
         Примеры:
         >>> musical_work = MusicalWork("Сонатина №6", "В.А.Моцарт", 140)  # инициализация экземпляра класса
         """
-        self.name = None
-        self.set_name(name)
-        self.author = None
-        self.set_author(author)
-        self.tempo = None
-        self.set_tempo(tempo)
+        if not isinstance(name, str):
+            raise TypeError("Название произведения должно быть строкой")
+        if not len(name) > 0:
+            raise ValueError("Название произведения не должно быть пустым")
+        self.name = name
+
+        if not isinstance(author, (str, type(None))):
+            raise TypeError("Имя автора должно быть строкой или пустым")
+        self.author = author
+
+        if not isinstance(tempo, int):
+            raise TypeError("Темп должен быть целым числом")
+        if not (40 <= tempo <= 320):
+            raise ValueError("Темп вне допустимого диапазона [40..320] bpm")
+        self.tempo = tempo
+
         self.patterns = []
 
     def set_name(self, name: str):
@@ -254,7 +287,7 @@ class MusicalWork:
             raise ValueError("Название произведения не должно быть пустым")
         self.name = name
 
-    def set_author(self, author: Union[str, None]):
+    def set_author(self, author: Optional[str]):
         """
         Задание автора произведения
 
@@ -264,7 +297,7 @@ class MusicalWork:
         >>> musical_work = MusicalWork("Сонатина №6", "Л.Моцарт", 140)  # инициализация экземпляра класса
         >>> musical_work.set_author("В.А.Моцарт")
         """
-        if not isinstance(author, (str, None)):
+        if not isinstance(author, (str, type(None))):
             raise TypeError("Имя автора должно быть строкой или пустым")
         self.author = author
 
@@ -280,7 +313,7 @@ class MusicalWork:
         """
         if not isinstance(tempo, int):
             raise TypeError("Темп должен быть целым числом")
-        if not (tempo >= 40 and tempo <= 320):
+        if not (40 <= tempo <= 320):
             raise ValueError("Темп вне допустимого диапазона [40..320] bpm")
         self.tempo = tempo
 
