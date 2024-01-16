@@ -26,11 +26,11 @@ class Book:
 
 
 class Library:
-    def __init__(self, books: list = []):
-        self.books = books
+    def __init__(self, books: list = None):
+        self.books = [] if books is None else books
 
     def get_next_book_id(self) -> int:
-        return 1 if len(self.books) == 0 else self.books[-1].id_ + 1
+        return 1 if not self.books else self.books[-1].id_ + 1
 
     def get_index_by_book_id(self, id_: int) -> int:
         for index, book in enumerate(self.books):
