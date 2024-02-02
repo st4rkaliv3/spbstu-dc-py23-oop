@@ -36,9 +36,6 @@ class PaperBook(Book):
             raise ValueError
         self._pages = value
 
-    def __str__(self):
-        return super().__str__()
-
     def __repr__(self):
         return f"{self.__class__.__name__}(name={self.name!r}, author={self.author!r}, pages={self.pages!r})"
 
@@ -59,9 +56,6 @@ class AudioBook(Book):
         if value <= 0:
             raise ValueError
         self._duration = value
-
-    def __str__(self):
-        return super().__str__()
 
     def __repr__(self):
         return f"{self.__class__.__name__}(name={self.name!r}, author={self.author!r}, duration={self.duration!r})"
