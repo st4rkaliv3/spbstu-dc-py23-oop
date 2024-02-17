@@ -95,6 +95,18 @@ class CrtScreen(Screen):
         super().__init__(name, width, height, dpi)
         self._frequency = frequency
 
+    @property
+    def frequency(self):
+        return self._frequency
+
+    @frequency.setter
+    def frequency(self, value):
+        if not isinstance(value, int):
+            raise TypeError("Атрибут frequency должен быть целым числом")
+        if value <= 0:
+            raise ValueError("Атрибут frequency должен быть положительным")
+        self._width = value
+
     def __scan_line(self, i_line: int):
         """
         Вывод очередной строки электронно-лучевой трубкой
@@ -121,8 +133,10 @@ class CrtScreen(Screen):
 
     def __repr__(self) -> str:
         """Репрезентация объекта"""
-        return f'CrtScreen(name="{self._name}", width={self._width}, height={self._height}, dpi={self._dpi}, frequency={self._frequency})'
+        return f'CrtScreen(name="{self._name}", width={self._width}, height={self._height},' \
+               f'dpi={self._dpi}, frequency={self._frequency})'
 
 
 if __name__ == "__main__":
     # Write your solution here
+    pass
